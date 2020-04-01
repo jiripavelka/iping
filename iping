@@ -1,0 +1,29 @@
+#!/bin/bash
+
+HOST="$1"
+SCRIPT_NAME="$(basename "$0")"
+USAGE="USAGE: $SCRIPT_NAME HOST"
+
+exception () {
+  MSG=${1:-"$SCRIPT_NAME exception"}
+  echo "EXCEPTION: $MSG" >&2
+  EC="${2:-1}"
+  [ "$EC" -eq 2 ] \
+    && echo $USAGE >&2
+  exit "$EC"
+}
+iping () {
+  OUT="$(ping -c1 -W2 $1 2>&1)"
+  SC=$?
+  echo -n "."
+  [ "$SC" -gt 0 ] \
+    && echo \
+    && echo -n "$(date) STATUS=$SC"
+  sleep 4
+  iping $1
+}
+
+[[ -n "$HOST" ]] \
+  || exception "Missing HOST" 2
+
+iping $HOST

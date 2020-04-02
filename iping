@@ -13,8 +13,8 @@ exception () {
   exit "$EC"
 }
 iping () {
-  OUT="$(ping -c1 -W2 $1 2>&1)"
-  SC=$?
+  ping -c1 -W2 "$1" 2>&1 >/dev/null
+  SC="$?"
   echo -n "."
   [ "$SC" -gt 0 ] \
     && echo \

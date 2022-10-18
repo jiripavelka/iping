@@ -12,10 +12,10 @@ exception () {
 iping () {
   ping -c1 -W2 "$1" >/dev/null 2>&1
   SC="$?"
-  echo -n "."
   [ "$SC" -gt 0 ] \
     && echo \
-    && echo -n "$(date) STATUS=$SC"
+    && echo -n "$(date) $SC " \
+    || echo -n "."
   sleep 4
   iping "${1}"
 }

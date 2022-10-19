@@ -1,12 +1,12 @@
 #!/bin/bash
 
 exception () {
-  MSG=${1:-"${0} exception"}
-  echo "EXCEPTION: $MSG" >&2
+  MSG=${1:-"Unexpected exception"}
+  echo "${MSG}" >&2
   EC="${2:-1}"
-  [ "$EC" -eq 2 ] \
+  [[ ${EC} -eq 2 ]] \
     && echo "USAGE: ${0} IP" >&2
-  exit "$EC"
+  exit "${EC}"
 }
 
 # https://stackoverflow.com/a/74128284/5611007
@@ -27,7 +27,7 @@ timestamp () {
 iping () {
   # shellcheck disable=SC2015
   ping -c1 -W2 "${1}" >/dev/null 2>&1 \
-    && echo -n "." \
+    && printf "." \
     || timestamp "${?}"
   sleep 4
   iping "${1}"

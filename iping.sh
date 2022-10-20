@@ -19,9 +19,9 @@ function valid_ip () {
   done
 }
 
-timestamp () {
+stamp () {
   [[ ${1} -lt 1 ]] \
-    && printf ":" \
+    && printf "%s" "${2}" \
     && return
   printf "\n%s %s" "$(date)" "${2}" # local format date
   printf '%(%Y-%m-%d %H:%M:%S)T %s\n' -1 "${2}" >> "${LOG_FILE}"
@@ -34,7 +34,7 @@ iping () {
   ping -c1 -W2 "${IP}" >/dev/null 2>&1 \
     && printf "." \
     && i=0 \
-    || timestamp $(( i++ )) "${?}"
+    || stamp $(( i++ )) "${?}"
   sleep 4
   done
 }

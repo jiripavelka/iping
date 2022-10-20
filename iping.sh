@@ -20,28 +20,33 @@ function valid_ip () {
 }
 
 timestamp () {
-  printf "\n%s %s" "$(date)" "${1}" # local format date
-  printf '%(%Y-%m-%d %H:%M:%S)T %s\n' -1 "${1}" >> "${LOG_FILE}"
+  [[ ${1} -lt 1 ]] \
+    && printf ":" \
+    && return
+  printf "\n%s %s" "$(date)" "${2}" # local format date
+  printf '%(%Y-%m-%d %H:%M:%S)T %s\n' -1 "${2}" >> "${LOG_FILE}"
 }
 
 iping () {
   # shellcheck disable=SC2015
-  ping -c1 -W2 "${1}" >/dev/null 2>&1 \
+  ping -c1 -W2 "${IP}" >/dev/null 2>&1 \
     && printf "." \
-    || timestamp "${?}"
+    && i=0 \
+    || timestamp $(( i++ )) "${?}"
   sleep 4
-  iping "${1}"
+  iping "${i}"
 }
 
 [[ -n "${1}" ]] \
   || exception "Missing IP." 2
-valid_ip "${1}" \
+IP=${1}
+valid_ip "${IP}" \
   || exception "Invalid IP format." 1
 LOG_DIR=/var/log/iping
 mkdir -p "${LOG_DIR}" \
   || exception "Unable to create log folder."
-LOG_FILE=/var/log/iping/${1}
+LOG_FILE=/var/log/iping/${IP}
 touch "${LOG_FILE}" \
   || exception "Unable to write into log file."
 
-iping "${1}"
+iping

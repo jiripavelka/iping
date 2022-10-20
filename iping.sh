@@ -28,13 +28,15 @@ timestamp () {
 }
 
 iping () {
+  local i=0
+  while true; do
   # shellcheck disable=SC2015
   ping -c1 -W2 "${IP}" >/dev/null 2>&1 \
     && printf "." \
     && i=0 \
     || timestamp $(( i++ )) "${?}"
   sleep 4
-  iping "${i}"
+  done
 }
 
 [[ -n "${1}" ]] \

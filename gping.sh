@@ -20,19 +20,19 @@ function valid_ip () {
 }
 
 function ping_output () {
-  local ms
-  local step
-  ms=${1}
-  [[ -z "${ms}" ]] \
-    && printf -- "%s TIMEOUT |" "${IP}" \
-    && ms=$(( TIMEOUT * 1000 )) \
-    || printf -- "%s % 4d ms |" "${IP}" "${ms}"
+  local line
+  local space
+  local count
+  line="-"
   space=$(( $(tput cols) - ${#IP} - 11 ))
-  step=$(( TIMEOUT * 1000 / space ))
-  over=$(( TIMEOUT * 1000 - step * space ))
-  while [ "${ms}" -gt "${over}" ]; do
-    printf "-"
-    (( ms -= step ))
+  count=$(( space * ${1} / TIMEOUT / 1000 ))
+  [[ -z "${1}" ]] \
+    && printf -- "%s TIMEOUT |" "${IP}" \
+    && line="=" \
+    && count=${space} \
+    || printf -- "%s % 4d ms |" "${IP}" "${1}"
+  while (( count-- > 0 )); do
+    printf "%s" "${line}"
   done
   echo ">"
 }

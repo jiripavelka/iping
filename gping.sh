@@ -1,12 +1,12 @@
 #!/bin/bash
 
+TIMEOUT=1 # ping timeout in seconds
+
 exception () {
-  MSG=${1:-"Unexpected exception"}
-  echo "${MSG}" >&2
-  EC="${2:-1}"
-  [[ ${EC} -eq 2 ]] \
+  echo "${1:-"General exception"}" >&2
+  [[ "${2}" -eq 2 ]] \
     && echo "USAGE: ${0} IP" >&2
-  exit "${EC}"
+  exit "${2:-1}"
 }
 
 # https://stackoverflow.com/a/74128284/5611007
@@ -21,30 +21,32 @@ function valid_ip () {
 
 function ping_output () {
   local line
+  local maxms
   local space
   local count
   line="-"
+  maxms=$(( TIMEOUT * 1000 ))
   space=$(( $(tput cols) - ${#IP} - 11 ))
-  count=$(( space * ${1} / TIMEOUT / 1000 ))
+  count=$(( space * ${1:-maxms} / maxms ))
   [[ -z "${1}" ]] \
     && printf -- "%s TIMEOUT |" "${IP}" \
     && line="=" \
-    && count=${space} \
     || printf -- "%s % 4d ms |" "${IP}" "${1}"
   while (( count-- > 0 )); do
-    printf "%s" "${line}"
+    printf -- "%s" "${line}"
   done
   echo ">"
 }
 
 function parse_ms () {
   echo "${1}" \
-    | grep ^rtt \
+    | grep "^rtt" \
     | cut -d/ -f5 \
     | cut -d. -f1
 }
 
 function gping () {
+  local p
   while true; do
     p=$( ping -c1 "-W${TIMEOUT}" "${IP}" ) \
       && ping_output "$(parse_ms "${p}")"
@@ -54,11 +56,10 @@ function gping () {
   done
 }
 
-TIMEOUT=1
 [[ -n "${1}" ]] \
   || exception "Missing IP." 2
 IP=${1}
 valid_ip "${IP}" \
-  || exception "Invalid IP format." 1
+  || exception "Invalid IP format."
 
 gping

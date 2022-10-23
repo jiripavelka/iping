@@ -1,12 +1,10 @@
 #!/bin/bash
 
 exception () {
-  MSG=${1:-"Unexpected exception"}
-  echo "${MSG}" >&2
-  EC="${2:-1}"
-  [[ ${EC} -eq 2 ]] \
+  echo "${1:-"General exception"}" >&2
+  [[ "${2}" -eq 2 ]] \
     && echo "USAGE: ${0} IP" >&2
-  exit "${EC}"
+  exit "${2:-1}"
 }
 
 # https://stackoverflow.com/a/74128284/5611007
